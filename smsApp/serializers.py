@@ -1,28 +1,55 @@
 from rest_framework import serializers
-from .models import User, Receipent, Message
+from .models import Recipient, Message, Group, GroupNumbers
+import uuid
 
 
-class UserSerializer(serializers.ModelSerializer):
+
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = user
+#         fields =  "__all__"
+
+
+class RecipientSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ("name", "phoneNumber", "email", "password")
-
-    def save(self):
-        user, created = User.objects.get_or_create(
-            phoneNumber=self.validated_data['phoneNumber'], name=self.validated_data['name'], email=self.validated_data['email'])
-        if created:
-            user.set_password(self.validated_data['password'])
-            user.save()
-
-
-class RecepientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Receipent
-        fields = "__all__"
+        model = Recipient
+        fields = ["recipientName", "recipientNumber", "userID"]
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    service_type = serializers.CharField(read_only=True)
+    messageStatus = serializers.ChoiceField(choices=['D', 'S','F','R','SC'], read_only=True)
+    transactionID = serializers.UUIDField(format='hex_verbose', initial=uuid.uuid4, read_only=True)
+
     class Meta:
         model = Message
-        fields = ["receiver", "author", "date_created",
-                  "content", "price", "status"]
+        fields = ["senderID", "content", "receiver", "service_type", "messageStatus", "transactionID"]
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    dateCreated = serializers.DateTimeField(read_only=True)
+    groupName = serializers.CharField(required=True)
+    groupID = serializers.UUIDField(format='hex_verbose', initial=uuid.uuid4, read_only=True)
+    senderID = serializers.CharField(required=True)
+    numbers = serializers.StringRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Group
+        fields = ["groupName", "senderID", "groupID", "dateCreated", "numbers"]
+        depth = 1
+
+class GroupNumbersSerializer(serializers.ModelSerializer):
+    dateCreated = serializers.DateTimeField(read_only=True)
+    group = serializers.SlugRelatedField(slug_field='groupName', queryset=Group.objects.all())
+    phoneNumbers = serializers.CharField(required=True)
+    class Meta:
+        model = GroupNumbers
+        fields = "__all__"
+
+
+class GroupNumbersPrimarySerializer(serializers.ModelSerializer):
+    dateCreated = serializers.DateTimeField(read_only=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
+    phoneNumbers = serializers.CharField(required=True)
+    class Meta:
+        model = GroupNumbers
+        fields = "__all__"
