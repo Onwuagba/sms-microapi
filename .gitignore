@@ -4,7 +4,7 @@
 *.pyc
 __pycache__
 db.sqlite3
-media
+# media
 
 # Backup files # 
 *.bak 
@@ -23,6 +23,8 @@ media
 .idea/**/gradle.xml 
 .idea/**/libraries 
 *.iws /out/ 
+
+.gitignore
 
 # Python # 
 *.py[cod] 
@@ -76,14 +78,17 @@ celerybeat-schedule.*
 *.sage.py 
 
 # Environments 
-.env 
+*.env 
 .venv 
 env/ 
-venv/ 
-smsVenv/ 
+venv/
+venv2/ 
+smsvenv/ 
+penv/
 ENV/ 
 env.bak/ 
 venv.bak/ 
+femvenv/
 
 # mkdocs documentation 
 /site 
@@ -115,3 +120,8 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+smsApp/migrations/0007_auto_20200720_1854.py
+
+
+# Virtual Env
+menv
